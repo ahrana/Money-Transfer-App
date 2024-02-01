@@ -1,0 +1,233 @@
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Currency Money Transfer App</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #e3e3e3;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #455d7a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .splash-content {
+    text-align: center;
+    color: #fff;
+  }
+
+  .logo {
+    font-size: 48px;
+    margin-bottom: 20px;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
+  }
+
+  h1 {
+    color: #233142;
+    text-align: center;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    color: #455d7a;
+  }
+
+  input[type="text"],
+  select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e3e3e3;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+
+  .btn {
+    display: inline-block;
+    background-color: #b80257;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .btn:hover {
+    background-color: #f95959;
+  }
+
+  .result {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #233142;
+    color: #fff;
+    border-radius: 5px;
+    display: none;
+    transition: all 0.5s ease;
+  }
+
+  .result.show {
+    display: block;
+  }
+
+  .transfer-animation {
+    animation: transfer 0.5s ease;
+  }
+
+  @keyframes transfer {
+    0% { transform: translateX(-100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+  }
+
+  /* Floating menu */
+  .floating-menu {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1001;
+  }
+
+  .floating-menu a {
+    display: block;
+    background-color: #b80257;
+    color: #fff;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+  }
+
+  .floating-menu a:hover {
+    background-color: #f95959;
+  }
+</style>
+</head>
+<body>
+
+<!-- Splash Screen -->
+<div class="splash-screen">
+  <div class="splash-content">
+    <div class="logo"><i class="fas fa-money-check-alt"></i></div>
+    <h2>Welcome to Money Transfer App</h2>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+  <h1><i class="fas fa-money-check-alt"></i> Money Transfer</h1>
+  <div class="form-group">
+    <label for="senderName">Sender's Name:</label>
+    <input type="text" id="senderName" placeholder="Enter sender's name">
+  </div>
+  <div class="form-group">
+    <label for="receiverName">Receiver's Name:</label>
+    <input type="text" id="receiverName" placeholder="Enter receiver's name">
+  </div>
+  <div class="form-group">
+    <label for="email">Email:</label>
+    <input type="text" id="email" placeholder="Enter email">
+  </div>
+  <div class="form-group">
+    <label for="country">Country:</label>
+    <input type="text" id="country" placeholder="Enter country">
+  </div>
+  <div class="form-group">
+    <label for="amount">Amount:</label>
+    <input type="text" id="amount" placeholder="Enter amount">
+  </div>
+  <div class="form-group">
+    <label for="currency">Currency:</label>
+    <select id="currency">
+      <option value="USD">USD</option>
+      <option value="EUR">EUR</option>
+      <option value="GBP">GBP</option>
+      <option value="JPY">JPY</option>
+    </select>
+  </div>
+  <button class="btn" onclick="transfer()">Transfer</button>
+  <div class="result" id="result"></div>
+</div>
+
+<!-- Floating Menu -->
+<div class="floating-menu">
+  <a href="#">My Account</a>
+  <a href="#">Contact</a>
+  <a href="#">Today's Currency Rates</a>
+</div>
+
+<script>
+  // Hide splash screen after 2 seconds
+  setTimeout(function(){
+    document.querySelector('.splash-screen').style.display = 'none';
+  }, 2000);
+
+  function transfer() {
+    var senderName = document.getElementById('senderName').value;
+    var receiverName = document.getElementById('receiverName').value;
+    var email = document.getElementById('email').value;
+    var country = document.getElementById('country').value;
+    var amount = document.getElementById('amount').value;
+    var currency = document.getElementById('currency').value;
+
+    var exchangeRate = getExchangeRate(currency);
+
+    var transferredAmount = amount * exchangeRate;
+    var summary = `
+      <p>Sender's Name: ${senderName}</p>
+      <p>Receiver's Name: ${receiverName}</p>
+      <p>Email: ${email}</p>
+      <p>Country: ${country}</p>
+      <p>Amount: ${amount} ${currency}</p>
+      <p>Transferred Amount: ${transferredAmount.toFixed(2)} USD</p>
+    `;
+
+    document.getElementById('result').innerHTML = summary;
+    document.getElementById('result').classList.add('show');
+    document.getElementById('result').classList.add('transfer-animation');
+  }
+
+  function getExchangeRate(currency) {
+    // Simulated exchange rates, replace with real data
+    var rates = {
+      'USD': 1,
+      'EUR': 0.88,
+      'GBP': 0.77,
+      'JPY': 109.55
+    };
+    return rates[currency];
+  }
+</script>
+
+</body>
